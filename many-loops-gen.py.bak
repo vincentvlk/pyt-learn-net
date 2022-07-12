@@ -1,0 +1,63 @@
+#!/Library/Frameworks/Python.framework/Versions/3.9/bin/python3
+#
+# Jednoduchy python skript, ktory generuje velky pocet LoopBack-ov na labovanie
+#
+import os
+#
+rnum = int(input('Zadaj cislo routera: '))
+#
+filename = 'R' + str(rnum) + '-many-loops-conf.txt'
+#
+filepath = os.popen('pwd')
+filepath = filepath.read()
+filepath = filepath[:-1]
+#
+f = open(filename, "w")
+#
+print('Jednoduchy skript, vygeneruje velky pocet LoopBack-ov na labovanie.\n')
+
+print('Generujem konfiguraciu pre router R' + str(rnum))
+print('!')
+print('end')
+print('undebug all')
+print('!')
+print('configure terminal')
+print('no logging console')
+#
+f.write('!Generujem konfiguraciu pre router R' + str(rnum) + '\n')
+f.write('!\n')
+f.write('end\n')
+f.write('undebug all\n')
+f.write('!\n')
+f.write('configure terminal\n')
+f.write('no logging console\n')
+f.write('!\n')
+#
+i = 1
+#
+for i in range(100, 255):
+    print('interface loopback' + str(rnum) + str(i))
+    print('  ip address 192.168.'+ str(rnum) + '0.' + str(i) + ' 255.255.255.255')
+    print('  ipv6 address fd00:' + str(rnum) + '0::' + str(i) + '/128')
+    #
+    f.write('interface loopback' + str(rnum) + str(i) + '\n')
+    f.write('  ip address 192.168.'+ str(rnum) + '0.' + str(i) + ' 255.255.255.255' + '\n')
+    f.write('  ipv6 address fd00:' + str(rnum) + '0::' + str(i) + '/128' + '\n')
+#
+f.write('!\n' + 'exit\n')
+f.write('!\n' + 'logging console\n')
+f.write('end\n')
+f.write('!\n' + '!Koniec konfiguracie v subore ' + filename)
+#
+#
+print('exit')
+print('!')
+print('logging console')
+print('!')
+print('end')
+print('write memory')
+print('!')
+#
+print('!Koniec skriptu. Konfiguracia ulozena do suboru:\n' + filepath + '/' + filename + '\n')
+#
+#EOF
