@@ -125,4 +125,3 @@ print('!')
 print('')
 #
 # koniec skriptu
-#
