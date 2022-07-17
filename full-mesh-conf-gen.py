@@ -7,22 +7,19 @@ import os
 #
 rnum = input('Zadaj cislo routera: ')
 rcount = input('Zadaj pocet routerov vo full-mesh topologii: ')
-iftype = input('Zadaj typ routera (1: vIOS | 2: vIOS-XE:): ')
+iftype = (input('Zadaj typ routera (1: vIOS | 2: vIOS-XE:): ') or "1")
 #
 rnum = int(rnum)
 rcount = int(rcount)
-iftype = int(iftype)
 mngint = ''
 #
 octB = 0
 octC = 0
 #
-if iftype == 1:
-    iftype = str(iftype)
+if iftype == "1":
     iftype = '0/'
     mngint = 'GigabitEthernet0/0'
 else:
-    iftype = str(iftype)
     iftype = ''
     mngint = 'GigabitEthernet' + str(rcount + 1)
 #
