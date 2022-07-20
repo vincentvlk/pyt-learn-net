@@ -12,7 +12,7 @@ import datetime
 
 # nastavime potrebne premenne
 
-f_zoznam = 'flotila.zoznam'
+f_zoznam = 'floila.zoznam'
 uzivatel = 'ssh'
 
 vlan_id = input('\nZadaj cislo hladanej VLAN: ')
@@ -24,7 +24,7 @@ try:
     f = open(f_zoznam, 'r')
     b_zoznam = f.readlines()
 except:
-    print('\n' + teraz + ' --> Nastala chyba pri otvarani suboru s adresami:', f_zoznam, '\n')
+    print('\n' + teraz + ' --> Nastala CHYBA pri otvarani suboru s adresami: ' + f_zoznam + '\n')
 
 # spustime 'for' slucku, ktora sa pre kazdu adresu v zozname pripoji a vykona 'prikaz'
 # v slucke este nastavujeme premennu 'teraz' s aktualnym sys. casom, kvoli logovaniu
@@ -35,15 +35,16 @@ for riadok in b_zoznam :
     print('\n' + teraz + ' --> Pripajam sa na adresu:', riadok)
     try:
         pripojenie = Netmiko(host = riadok,
-                             device_type = 'cisco_ios', 
+                             device_type = 'cisco_nxos', 
                              username = uzivatel, 
                              password = 'ssh.2022')
 
         vystup = (pripojenie.send_command(prikaz))
 
     except:
-        print(teraz + ' --> Nastala chyba pri SSH pripojeni na:', riadok)
-    
+        print(teraz + ' --> Nastala CHYBA pri SSH pripojeni na:', riadok)
+        vystup = '-NEDOSTUPNY-'
+
     pripojenie.disconnect
 
     print('Odpoved z', riadok[:-1], ':', vystup)

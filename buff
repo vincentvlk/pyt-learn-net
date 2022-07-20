@@ -54,3 +54,12 @@ line console 0
  privilege level 15
 exit
 !
+!
+vlan 100
+ name stovka
+vlan 200
+ name dvestovka
+vlan 300
+ name tristovka
+end
+!
