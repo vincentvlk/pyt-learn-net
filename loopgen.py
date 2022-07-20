@@ -5,6 +5,7 @@
 import os
 #
 rnum = input('Zadaj cislo routera: ')
+rnum = str(rnum)
 #
 print('')
 print('!')
