@@ -2,14 +2,17 @@
 '''
 toto je pokec a poznamky ku skriptu co hlada volne/obsadene VLANy
 poznamka: show vlan id 100 | include active|not
+
+na cisco box-e bol pridany user s prikazom: 'username ssh privilege 15 secret ssh.2022'
 '''
 
 from netmiko import Netmiko
 import datetime
 
 f_zoznam = 'flotila.zoznam'
-dev_num = 1
-vlan_id = 100
+uzivatel = 'ssh'
+vlan_id = input('\nZadaj cislo hladanej VLAN: ')
+prikaz = 'show vlan id ' + vlan_id + ' | include active|not'
 
 try:
     f = open(f_zoznam, 'r')
@@ -17,17 +20,20 @@ try:
 except:
         print('\nNastala chyba pri otvarani suboru s adresami', f_zoznam, '\n')
 
-for i in b_zoznam :
-    print('\nPripajam sa na adresu:', i)
+for riadok in b_zoznam :
+    teraz = str(datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S'))
+    print('\n' + teraz + ' --> Pripajam sa na adresu:', riadok)
     try:
-        pripojenie = Netmiko(host = i,
+        pripojenie = Netmiko(host = riadok,
                              device_type = 'cisco_ios', 
-                             username ='ssh', 
+                             username = uzivatel, 
                              password = 'ssh.2022')
 
-        vystup = (pripojenie.send_command('show vlan id 100 | include active|not'))
+        vystup = (pripojenie.send_command(prikaz))
+
     except:
-        print('Nastala chyba pri SSH pripojeni na:', i)
+        print('Nastala chyba pri SSH pripojeni na:', riadok)
     
     pripojenie.disconnect
-    print(vystup)
+
+    print('Odpoved z', riadok[:-1], ':', vystup)
