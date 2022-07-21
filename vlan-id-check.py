@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 '''
-toto je pokec a poznamky ku skriptu co hlada volne/obsadene VLANy
-poznamka: show vlan id 100 | include active|not
-
-na cisco box-e bol pridany user: 'username ssh privilege 15 secret ssh.2022'
+Jednoduchy skript hlada volne/obsadene VLANy na Cis. Catalyst/Nexus sw.
+Je potrebne intalovat python modul: $ pip3 install netmiko
+by vlkv@jul2022
 '''
 # importujeme potrebne moduly/kniznice:
 
@@ -15,9 +14,11 @@ import datetime
 # nastavujeme premennu 'teraz' s aktualnym systemovym casom, kvoli logovaniu
 
 f_zoznam = 'flotila.zoznam'
-uzivatel = 'ssh'
+uzivatel = 'sshview'
 
 vlan_id = input('\nZadaj cislo hladanej VLAN: ')
+heslo = getpass('Zadajte SSH heslo pre uzivatela \"' + uzivatel +'\": ')
+
 prikaz = 'show vlan id ' + vlan_id + ' | include active|not'
 teraz = str(datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S'))
 
@@ -38,7 +39,7 @@ for riadok in b_zoznam :
         pripojenie = Netmiko(host = riadok,
                              device_type = 'cisco_nxos', 
                              username = uzivatel, 
-                             password = 'ssh.2022')
+                             password = heslo)
 
         vystup = (pripojenie.send_command(prikaz))
 
