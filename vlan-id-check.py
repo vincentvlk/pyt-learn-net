@@ -1,23 +1,26 @@
 #!/usr/bin/env python3
 '''
-Jednoduchy Pyt3 skript hlada volne/obsadene VLANy na Cis. Catalyst/Nexus sw.
+Jednoduchy Py3 skript hlada volne/obsadene VLANy na Cis. Catalyst/Nexus Sw.
 Je potrebne intalovat python modul: $ pip3 install netmiko
 by vlkv@jul2022
 '''
-# importujeme potrebne moduly/kniznice:
 
+# importujeme potrebne moduly/kniznice:
 from netmiko import Netmiko
 from getpass import getpass
+import colorama
+from colorama import Fore
 import datetime
-
 '''
 - nastavime potrebne premenne:
 - nastavujeme premennu "teraz" s aktualnym systemovym casom, kvoli logovaniu
 '''
+colorama.init(autoreset=True)
+
 f_zoznam = 'flotila.zoznam'
 uzivatel = 'sshview'
 
-vlan_id = input('\nZadaj cislo hladanej VLAN: ')
+vlan_id = input('\nZadajte cislo hladanej VLAN: ')
 heslo = getpass('Zadajte SSH heslo pre uzivatela \"' + uzivatel + '\": ')
 
 prikaz = 'show vlan id ' + vlan_id + ' | include active|not'
@@ -27,8 +30,9 @@ teraz = str(datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S'))
 try:
     f = open(f_zoznam, 'r')
     b_zoznam = f.readlines()
-except FileNotFoundError:
-    print('\n' + teraz + ' --> CHYBA pri otvarani suboru: ' + f_zoznam + '\n')
+except Exception as err:
+    print(Fore.RED + '\n' + teraz + ' --> CHYBA suboru: ' + f_zoznam + '\n')
+    print(err)
 
 print()
 
@@ -48,12 +52,12 @@ for riadok in b_zoznam:
 
         vystup = (pripojenie.send_command(prikaz))
 
-    except (Netmiko.ssh_exception):
-        print(teraz + ' --> CHYBA pri SSH pripojeni na:', riadok)
-        vystup = '-NEDOSTUPNY-'
+    except Exception as err:
+        print(Fore.RED + teraz + ' --> CHYBA pri SSH pripojeni na:', riadok)
+        print(err)
+        vystup = '-NEDOSTUPNA-\n'
 
     pripojenie.disconnect
-
     print('Odpoved z', riadok[:-1], ':', vystup)
 
 teraz = str(datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S'))
