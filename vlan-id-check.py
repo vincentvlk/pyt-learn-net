@@ -3,32 +3,33 @@
 toto je pokec a poznamky ku skriptu co hlada volne/obsadene VLANy
 poznamka: show vlan id 100 | include active|not
 
-na cisco box-e bol pridany user s prikazom: 'username ssh privilege 15 secret ssh.2022'
+na cisco box-e bol pridany user: 'username ssh privilege 15 secret ssh.2022'
 '''
-# importujeme potrebne moduly/kniznice
+# importujeme potrebne moduly/kniznice:
 
 from netmiko import Netmiko
+from getpass import getpass
 import datetime
 
-# nastavime potrebne premenne
+# nastavime potrebne premenne:
+# nastavujeme premennu 'teraz' s aktualnym systemovym casom, kvoli logovaniu
 
-f_zoznam = 'floila.zoznam'
+f_zoznam = 'flotila.zoznam'
 uzivatel = 'ssh'
 
 vlan_id = input('\nZadaj cislo hladanej VLAN: ')
 prikaz = 'show vlan id ' + vlan_id + ' | include active|not'
 teraz = str(datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S'))
 
-# nacitame subor so zoznamom adries
+# nacitame subor so zoznamom adries/zariadeni:
 try:
     f = open(f_zoznam, 'r')
     b_zoznam = f.readlines()
 except:
-    print('\n' + teraz + ' --> Nastala CHYBA pri otvarani suboru s adresami: ' + f_zoznam + '\n')
+    print('\n' + teraz + ' --> CHYBA pri otvarani suboru: ' + f_zoznam + '\n')
 
-# spustime 'for' slucku, ktora sa pre kazdu adresu v zozname pripoji a vykona 'prikaz'
-# v slucke este nastavujeme premennu 'teraz' s aktualnym sys. casom, kvoli logovaniu
-# do premennej 'vystup' ulozime odpoved zo zadaneho prikazu z 'prikaz'
+# spustime for slucku, ktora sa na IP/name v zozname pripoji a vykona 'prikaz'
+# do premennej 'vystup' ulozime odpoved zo zadaneho prikazu z prem. 'prikaz'
 for riadok in b_zoznam :
     teraz = str(datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S'))
 
@@ -42,7 +43,7 @@ for riadok in b_zoznam :
         vystup = (pripojenie.send_command(prikaz))
 
     except:
-        print(teraz + ' --> Nastala CHYBA pri SSH pripojeni na:', riadok)
+        print(teraz + ' --> CHYBA pri SSH pripojeni na:', riadok)
         vystup = '-NEDOSTUPNY-'
 
     pripojenie.disconnect
