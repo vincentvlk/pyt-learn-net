@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Jednoduchy Py3 skript hlada volne/obsadene VLANy na Cis. Catalyst/Nexus Sw.
-Je potrebne intalovat python modul: $ pip3 install netmiko
+Je potrebne intalovat python modul "netmiko" s: $ pip3 install netmiko
 by vlkv@jul2022
 '''
 
