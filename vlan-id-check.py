@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 Jednoduchy Py3 skript hlada volne/obsadene VLANy na Cis. Catalyst/Nexus Sw.
-Je potrebne intalovat python modul "netmiko" s: $ pip3 install netmiko
+Treba intalovat python moduly s: $ pip3 install netmiko colorama
 by vlkv@jul2022
 '''
 
@@ -11,6 +11,7 @@ from getpass import getpass
 import colorama
 from colorama import Fore
 import datetime
+
 '''
 - nastavime potrebne premenne:
 - nastavujeme premennu "teraz" s aktualnym systemovym casom, kvoli logovaniu
@@ -58,7 +59,7 @@ for riadok in b_zoznam:
         vystup = '-NEDOSTUPNA-\n'
 
     pripojenie.disconnect
-    print('Odpoved z', riadok[:-1], ':', vystup)
+    print(Fore.CYAN + 'Odpoved z', riadok[:-1], ':', vystup)
 
 teraz = str(datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S'))
 print(teraz + ' --> KONIEC skriptu.')
