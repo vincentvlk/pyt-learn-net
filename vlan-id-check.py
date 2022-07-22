@@ -51,7 +51,7 @@ for riadok in b_zoznam:
                              username=uzivatel,
                              password=heslo)
 
-        vystup = (pripojenie.send_command(prikaz))
+        vystup = (Fore.CYAN + pripojenie.send_command(prikaz))
 
     except Exception as err:
         print(Fore.RED + teraz + ' --> CHYBA pri SSH pripojeni na:', riadok)
