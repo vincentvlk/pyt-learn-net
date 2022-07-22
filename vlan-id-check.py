@@ -20,11 +20,6 @@ colorama.init(autoreset=True)
 
 f_zoznam = 'flotila.zoznam'
 uzivatel = 'sshview'
-
-vlan_id = input('\nZadajte cislo hladanej VLAN: ')
-heslo = getpass('Zadajte SSH heslo pre uzivatela \"' + uzivatel + '\": ')
-
-prikaz = 'show vlan id ' + vlan_id + ' | include active|not'
 teraz = str(datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S'))
 
 # nacitame subor so zoznamom adries/zariadeni do bufferu:
@@ -34,6 +29,11 @@ try:
 except Exception as err:
     print(Fore.RED + '\n' + teraz + ' --> CHYBA suboru: ' + f_zoznam + '\n')
     print(err)
+    raise
+
+vlan_id = input('\nZadajte cislo hladanej VLAN: ')
+heslo = getpass('Zadajte SSH heslo pre uzivatela \"' + uzivatel + '\": ')
+prikaz = 'show vlan id ' + vlan_id + ' | include active|not'
 
 print()
 
