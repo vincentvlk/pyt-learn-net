@@ -50,6 +50,12 @@ print()
 
 for idx in range(pocet_vlan_vni_map):
     zoznam_vlan.append(idx)
+    dupl = [number for number in zoznam_vlan if zoznam_vlan.count(number) > 1]
+
+    if len(dupl) > 1:
+        print(Fore.RED + '\n --> CHYBA vstupu: Duplicita v zozname VLAN!' '\n')
+        idx = 0
+
     while True:
         try:
             vstup = input('Zadajte cislo ' + str(idx + 1) + '. L2 VLANy : ')
