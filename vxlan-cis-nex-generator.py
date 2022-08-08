@@ -50,11 +50,8 @@ print()
 
 for idx in range(pocet_vlan_vni_map):
     zoznam_vlan.append(idx)
-    dupl = [number for number in zoznam_vlan if zoznam_vlan.count(number) > 1]
 
-    if len(dupl) > 1:
-        print(Fore.RED + '\n --> CHYBA vstupu: Duplicita v zozname VLAN!' '\n')
-        idx = 0
+    dupl = [number for number in zoznam_vlan if zoznam_vlan.count(number) > 1]
 
     while True:
         try:
@@ -65,8 +62,28 @@ for idx in range(pocet_vlan_vni_map):
         except Exception as err:
             print(Fore.RED + '\n --> CHYBA vstupu: ' + str(err) + '\n')
 
+    dupl = [number for number in zoznam_vlan if zoznam_vlan.count(number) > 1]
+
+    if len(dupl) > 0:
+        print(Fore.RED + '\n--> CHYBA vstupu: Duplicita v zozname!\n')
+        stara_hodnota = zoznam_vlan[idx]
+        while zoznam_vlan[idx] == stara_hodnota:
+            vstup = input('Zadajte NOVE cislo ' + str(idx + 1) + '. VLANy : ')
+            vstup = int(vstup)
+            zoznam_vlan[idx] = vstup
+
+dupl = [number for number in zoznam_vlan if zoznam_vlan.count(number) > 1]
+
+if len(dupl) > 0:
+    print(Fore.RED + '\n--> CHYBA vstupu: Duplicita v zozname!')
+    stara_hodnota = zoznam_vlan[idx]
+    while zoznam_vlan[idx] == stara_hodnota:
+        vstup = input('Zadajte NOVE cislo ' + str(idx + 1) + '. VLANy : ')
+        vstup = int(vstup)
+        zoznam_vlan[idx] = vstup
+
 print()
 print(zoznam_vlan)
 
-prefix_l2_vni = input('Zadajte prefix pre VNI (napr. 4 cisla z c. zmluvy): ')
+prefix_l2_vni = input('\nZadajte prefix pre VNI (napr. 4 cisla z c. zmluvy): ')
 # EOF
