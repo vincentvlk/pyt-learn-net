@@ -9,6 +9,7 @@ by vlkv@Aug2022
 DOROBIT: - check na validne cislo VNI (24-bit rozsah)
          - dat chybove hlasky do premennych
          - spravit funkciu na zadavanie VLAN, uz sa opakuje
+         - osetrit zadavanie prefixu, aby to bolo cislo
 '''
 
 # importujeme potrebne moduly/kniznice:
