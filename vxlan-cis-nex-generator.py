@@ -15,10 +15,11 @@ DOROBIT: - check na validne cislo VNI (24-bit rozsah)
 import colorama
 from colorama import Fore
 import datetime
-
+#
 colorama.init(autoreset=True)
 teraz = str(datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S'))
 #
+bgp_as_num = '64512'
 vrf_volba = ''
 vrf_nazov = ''
 vrf_l3_vlan = ''
@@ -28,9 +29,6 @@ zoznam_vlan = []
 #
 err_vlan_mimo = '\n--> CHYBA vstupu: Cislo VLANy mimo povoleny rozsah!\n'
 err_zoznam_dupl = '\n--> CHYBA vstupu: Duplicita v zozname L2 VLAN!\n'
-#
-
-bgp_as_num = '64512'
 
 print('\nJednoduchy Py3 skript generuje VXLAN-EVPN konf. pre Cisco Nexus Sw.')
 
