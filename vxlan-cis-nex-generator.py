@@ -199,11 +199,13 @@ for idx in range(pocet_vlan_vni_map):
 print('!')
 print('evpn')
 for idx in range(pocet_vlan_vni_map):
-    print('vni ' + str(pfx_vni) + str(zoznam_vlan[idx]) + ' l2')
-    print('  rd auto')
-    print('    route-target import auto')
-    print('    route-target export auto')
+    print('  vni ' + str(pfx_vni) + str(zoznam_vlan[idx]) + ' l2')
+    print('    rd auto')
+    print('      route-target import auto')
+    print('      route-target export auto')
 
+print('!')
+print('end')
 print('!')
 print('! Koniec VXLAN-EVPN konfigurácie.')
 print('!')
