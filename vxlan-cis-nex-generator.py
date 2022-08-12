@@ -74,7 +74,7 @@ for idx in range(pocet_vlan_vni_map):
 
     while True:
         try:
-            vstup = input('Zadajte cislo ' + str(idx + 1) + '. L2-VLANy: ')
+            vstup = input('Zadajte číslo ' + str(idx + 1) + '. L2-VLANy: ')
             vstup = int(vstup)
             zoznam_vlan[idx] = vstup
             if (vstup < 2 or vstup > 3967):
@@ -119,7 +119,7 @@ while vrf_l3_vlan == '':
         print(Fore.RED + '\n-> CHYBA vstupu: Prefix mimo rozsah! (1-1677)\n')
         vrf_l3_vlan = ''
     elif int(vni_max) > 16777216:
-        print(Fore.RED + '\n-> CHYBA vstupu: Prefix + VLAN mimo rozsah VNI!\n')
+        print(Fore.RED + '\n-> CHYBA vstupu: "Prefix+VLAN" mimo rozsah VNI!\n')
         vrf_l3_vlan = ''
     else:
         vrf_l3_vlan = pfx_vni
