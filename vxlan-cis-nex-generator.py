@@ -18,9 +18,10 @@ from colorama import Fore
 import datetime
 #
 colorama.init(autoreset=True)
-teraz = str(datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S'))
+t_teraz = str(datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S'))
 #
 bgp_as_num = '64512'
+any_gw_mac = '2022.2022.2022'
 #
 vrf_volba = ''
 vrf_nazov = ''
@@ -38,7 +39,7 @@ err_pfx_mimo = '\n-> CHYBA vstupu: Prefix mimo rozsah! (1-9999)\n'
 #
 s_uvod = 'Jednoduchý Py3 skript generuje VXLAN-EVPN konf. pre Cisco Nexus Sw.'
 s_treba = 'Treba zadať hodnoty VLAN a VNI prefixu tak, aby vzniklo platné VNI.'
-s_limit = 'Skript generuje VNI tak, aby boli menšie ako 16777216 (24-bit VNI).'
+s_limit = 'Skript vkladá VNI tak, aby boli menšie ako 16777216 (24-bit VNI).'
 s_vlan_summary = 'Zoznam VLAN na L2-VNI mapovanie: '
 s_vrf_volba = '\nGenerovať konfiguráciu do Tenant VRF? (a:Áno / n:Nie): '
 s_pfx_volba = '\nChcete L3-VNI využiť ako prefix pre L2-VNI (a:Áno / n:Nie): '
@@ -63,14 +64,15 @@ while vrf_volba == 'a':
     except Exception as err:
         print(Fore.RED + '\n-> CHYBA vstupu: ' + str(err) + '\n')
 
-pfx_volba = input(s_pfx_volba)
+if vrf_volba == 'a':
+    pfx_volba = input(s_pfx_volba)
 
 if pfx_volba != 'a':
     vrf_l3_vlan = ''
 
 while True:
     try:
-        pocet_vlan_vni_map = input('\nZadajte počet VLAN/L2-VNI mapovaní: ')
+        pocet_vlan_vni_map = input('\nZadajte počet VLAN / L2-VNI mapovaní: ')
         pocet_vlan_vni_map = int(pocet_vlan_vni_map)
         break
     except Exception as err:
@@ -136,7 +138,44 @@ print('Názov VRF pre Tenant VXLAN-EVPN: \t' + vrf_nazov)
 print('Číslo VLAN na L3-VNI mapovanie: \t' + str(vrf_l3_vlan))
 print(s_vlan_summary + '\t' + str(zoznam_vlan))
 print('Prefix na generovanie L2-VNI: \t\t' + str(pfx_vni))
-print('String VNI prefix + VLAN maximum: \t' + vni_max)
+print('String "VNI prefix + VLAN maximum": \t' + vni_max)
 print('=' * 80)
 
+#################
+
+print('\n-> Generujem VXLAN-EVPN konfiguráciu:\n')
+print('=' * 80)
+print('!')
+print('! Začiatok generovania: ' + t_teraz)
+
+for idx in range(pocet_vlan_vni_map):
+    print('!')
+    print('vlan ' + str(zoznam_vlan[idx]))
+    print('  name CustID-' + str(pfx_vni) + '-segment' + str(zoznam_vlan[idx]))
+    print('  vn-segment ' + str(pfx_vni) + str(zoznam_vlan[idx]))
+
+if vrf_volba == 'a':
+    print('!')
+    print('vlan ' + str(vrf_l3_vlan))
+    print('  name L3-VNI-for-CustID-' + str(vrf_l3_vlan))
+    print('  vn-segment ' + str(vrf_l3_vlan))
+
+    print('!')
+    print('vrf context ' + vrf_nazov)
+    print('  rd auto')
+    print('  vni ' + str(vrf_l3_vlan))
+    print('  address-family ipv4 unicast')
+    print('    route-target both auto')
+    print('    route-target both auto evpn')
+
+    print('!')
+    print('interface Vlan' + str(vrf_l3_vlan))
+    print('  description L3-VNI-for-CustID-' + str(vrf_l3_vlan))
+    print('  no shutdown')
+    print('  vrf member ' + vrf_nazov)
+    print('  no ip redirects')
+    print('  ip forward')
+
+print('!')
+print('! VXLAN-EVPN konf. bola vygenerovaná v čase: ' + t_teraz)
 # EOF
