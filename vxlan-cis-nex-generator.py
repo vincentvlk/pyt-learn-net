@@ -6,8 +6,8 @@ Kontrola s: '$ pip3 list'
 
 by vlkv@Aug2022
 
-DOROBIT: - check na validne cislo VNI (24-bit rozsah)
-         - dat chybove hlasky do premennych
+DOROBIT: - Dorobit generator pre "EVPN" sekciu
+         - Popisat kod tak, aby sa dal po roku pochopit
          - spravit funkciu na zadavanie VLAN, uz sa opakuje
          - osetrit zadavanie prefixu, aby to bolo cislo
 '''
@@ -43,7 +43,9 @@ s_limit = 'Skript vkladá VNI tak, aby boli menšie ako 16777216 (24-bit VNI).'
 s_vlan_summary = 'Zoznam VLAN na L2-VNI mapovanie: '
 s_vrf_volba = '\nGenerovať konfiguráciu do Tenant VRF? (a:Áno / n:Nie): '
 s_pfx_volba = '\nChcete L3-VNI využiť ako prefix pre L2-VNI (a:Áno / n:Nie): '
-#
+
+###############################################################################
+
 print(Fore.YELLOW + '\n' + s_uvod)
 print(Fore.YELLOW + s_treba)
 print(Fore.YELLOW + s_limit)
@@ -138,12 +140,12 @@ print('Prefix na generovanie L2-VNI: \t\t' + str(pfx_vni))
 print('String "VNI prefix + VLAN maximum": \t' + vni_max)
 print('=' * 80)
 
-#################
+###############################################################################
 
 print('\n-> Generujem VXLAN-EVPN konfiguráciu:\n')
 print('=' * 80)
 print('!')
-print('! Začiatok generovania: ' + t_teraz)
+print('! Nová VXLAN-EVPN konfigurácia vygenerovaná v čase: ' + t_teraz)
 
 for idx in range(pocet_vlan_vni_map):
     print('!')
@@ -195,5 +197,14 @@ for idx in range(pocet_vlan_vni_map):
     print('    ingress-replication protocol bgp')
 
 print('!')
-print('! VXLAN-EVPN konf. bola vygenerovaná v čase: ' + t_teraz)
+print('evpn')
+for idx in range(pocet_vlan_vni_map):
+    print('vni ' + str(pfx_vni) + str(zoznam_vlan[idx]) + ' l2')
+    print('  rd auto')
+    print('    route-target import auto')
+    print('    route-target export auto')
+
+print('!')
+print('! Koniec VXLAN-EVPN konfigurácie.')
+print('!')
 # EOF
