@@ -148,6 +148,7 @@ print('\n-> Generujem VXLAN-EVPN konfiguráciu:\n')
 print('=' * 80)
 print('!')
 print('! Nová VXLAN-EVPN konfigurácia vygenerovaná v čase: ' + t_teraz)
+print('! Dôkladne SKONTROLUJTE vygenerovanú konfiguráciu!')
 
 for idx in range(pocet_vlan_vni_map):
     print('!')
