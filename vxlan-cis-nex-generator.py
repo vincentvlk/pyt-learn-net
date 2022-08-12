@@ -25,20 +25,21 @@ bgp_as_num = '64512'
 vrf_volba = ''
 vrf_nazov = ''
 vrf_l3_vlan = ''
-prefix_l2_vni = ''
+pfx_vni = ''
 pocet_vlan_vni_map = ''
 zoznam_vlan = []
+vni_max = ''
 #
-err_vlan_mimo = '\n--> CHYBA vstupu: Číslo VLANy mimo povolený rozsah!\n'
-err_zoznam_dupl = '\n--> CHYBA vstupu: Duplicita v zozname L2 VLAN!\n'
+err_vlan_mimo = '\n-> CHYBA vstupu: Číslo VLANy mimo rozsah! (2-3967)\n'
+err_zoznam_dupl = '\n-> CHYBA vstupu: Duplicita v zozname L2 VLAN!\n'
 s_uvod = 'Jednoduchý Py3 skript generuje VXLAN-EVPN konf. pre Cisco Nexus Sw.'
 s_treba = 'Treba zadať hodnoty VLAN a VNI prefixu tak, aby vzniklo platné VNI.'
+s_limit = 'Skript generuje VNI tak, aby boli menšie ako 16777216 (24-bit VNI).'
 s_vlan_summary = 'Zoznam VLAN na L2-VNI mapovanie: '
 #
-
 print(Fore.YELLOW + '\n' + s_uvod)
 print(Fore.YELLOW + s_treba)
-print(Fore.YELLOW + 'Skript generuje VNIs tak, aby boli menšie ako 16777216.')
+print(Fore.YELLOW + s_limit)
 
 vrf_volba = input('\nGenerovať konfiguráciu do Tenant VRF? (a:Áno / n:Nie): ')
 
@@ -54,11 +55,11 @@ while vrf_volba == 'a':
         else:
             break
     except Exception as err:
-        print(Fore.RED + '\n--> CHYBA vstupu: ' + str(err) + '\n')
+        print(Fore.RED + '\n-> CHYBA vstupu: ' + str(err) + '\n')
 
 while True:
     try:
-        pocet_vlan_vni_map = input('\nZadajte pocet VLAN / L2-VNI mapovani: ')
+        pocet_vlan_vni_map = input('\nZadajte počet VLAN/L2-VNI mapovaní: ')
         pocet_vlan_vni_map = int(pocet_vlan_vni_map)
         break
     except Exception as err:
@@ -73,7 +74,7 @@ for idx in range(pocet_vlan_vni_map):
 
     while True:
         try:
-            vstup = input('Zadajte cislo ' + str(idx + 1) + '. L2-VLANy : ')
+            vstup = input('Zadajte cislo ' + str(idx + 1) + '. L2-VLANy: ')
             vstup = int(vstup)
             zoznam_vlan[idx] = vstup
             if (vstup < 2 or vstup > 3967):
@@ -89,7 +90,7 @@ for idx in range(pocet_vlan_vni_map):
         print(Fore.RED + err_zoznam_dupl)
         stara_hodnota = zoznam_vlan[idx]
         while zoznam_vlan[idx] == stara_hodnota:
-            vstup = input('Zadajte NOVÉ číslo ' + str(idx + 1) + '. VLANy : ')
+            vstup = input('Zadajte NOVÉ číslo ' + str(idx + 1) + '. VLANy: ')
             vstup = int(vstup)
             zoznam_vlan[idx] = vstup
 
@@ -99,29 +100,48 @@ if len(dupl) > 0:
     print(Fore.RED + err_zoznam_dupl)
     stara_hodnota = zoznam_vlan[idx]
     while zoznam_vlan[idx] == stara_hodnota:
-        vstup = input('Zadajte NOVÉ číslo ' + str(idx + 1) + '. VLANy : ')
+        vstup = input('Zadajte NOVÉ číslo ' + str(idx + 1) + '. VLANy: ')
         vstup = int(vstup)
         zoznam_vlan[idx] = vstup
 
 print()
 
-if vrf_l3_vlan == '':
-    prefix_l2_vni = input('Zadajte prefix na generovanie VNI (max. 4 čísla): ')
-    print()
-else:
-    prefix_l2_vni = vrf_l3_vlan
+while vrf_l3_vlan == '':
+    try:
+        pfx_vni = input('Zadajte prefix na generovanie VNI (max. 4 čísla): ')
+        vni_max = (pfx_vni + str(max(zoznam_vlan)))
+        pfx_vni = int(pfx_vni)
+        print()
+    except Exception as err:
+        print(Fore.RED + '\n-> CHYBA vstupu: ' + str(err) + '\n')
+        pfx_vni = 0
+    if (pfx_vni < 1 or pfx_vni > 9999):
+        print(Fore.RED + '\n-> CHYBA vstupu: Prefix mimo rozsah! (1-1677)\n')
+        vrf_l3_vlan = ''
+    elif int(vni_max) > 16777216:
+        print(Fore.RED + '\n-> CHYBA vstupu: Prefix + VLAN mimo rozsah VNI!\n')
+        vrf_l3_vlan = ''
+    else:
+        vrf_l3_vlan = pfx_vni
+
+if vrf_l3_vlan != '':
+    pfx_vni = vrf_l3_vlan
 
 print('=' * 80)
 print('Boli zadané tieto hodnoty:\n')
 
 if vrf_volba == 'a':
     print('Generovať konfiguráciu do Tenant VRF: \tÁno')
+    vni_max = (str(pfx_vni) + str(max(zoznam_vlan)))
 else:
     print('Generovať konfiguráciu do Tenant VRF: \tNie')
+    vrf_l3_vlan = ''
 
 print('Názov VRF pre Tenant VXLAN-EVPN: \t' + vrf_nazov)
 print('Číslo VLAN na L3-VNI mapovanie: \t' + str(vrf_l3_vlan))
 print(s_vlan_summary + '\t' + str(zoznam_vlan))
-print('Prefix na generovanie L2-VNI: \t\t' + str(prefix_l2_vni))
+print('Prefix na generovanie L2-VNI: \t\t' + str(pfx_vni))
+print('VNI prefix + VLAN maximum: \t\t' + vni_max)
 print('=' * 80)
+
 # EOF
