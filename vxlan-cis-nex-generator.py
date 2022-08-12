@@ -27,7 +27,7 @@ vrf_volba = ''
 vrf_nazov = ''
 vrf_l3_vlan = ''
 pfx_volba = ''
-pfx_vni = ''
+pfx_vni = 0
 pocet_vlan_vni_map = ''
 zoznam_vlan = []
 vni_max = ''
@@ -67,8 +67,8 @@ while vrf_volba == 'a':
 if vrf_volba == 'a':
     pfx_volba = input(s_pfx_volba)
 
-if pfx_volba != 'a':
-    vrf_l3_vlan = ''
+if pfx_volba == 'a':
+    pfx_vni = vrf_l3_vlan
 
 while True:
     try:
@@ -103,7 +103,7 @@ for idx in range(pocet_vlan_vni_map):
 
 print()
 
-while vrf_l3_vlan == '':
+while pfx_vni == 0:
     try:
         pfx_vni = input('Zadajte prefix na generovanie VNI (max. 4 čísla): ')
         vni_max = (pfx_vni + str(max(zoznam_vlan)))
@@ -114,12 +114,12 @@ while vrf_l3_vlan == '':
         pfx_vni = 0
     if (pfx_vni < 1 or pfx_vni > 9999):
         print(Fore.RED + err_pfx_mimo)
-        vrf_l3_vlan = ''
+        pfx_vni = 0
     elif int(vni_max) > 16777216:
         print(Fore.RED + err_vni_mimo)
-        vrf_l3_vlan = ''
+        pfx_vni = 0
     else:
-        vrf_l3_vlan = pfx_vni
+        pfx_vni = int(pfx_vni)
 
 if vrf_l3_vlan != '':
     pfx_vni = vrf_l3_vlan
@@ -175,6 +175,19 @@ if vrf_volba == 'a':
     print('  vrf member ' + vrf_nazov)
     print('  no ip redirects')
     print('  ip forward')
+
+    print('!')
+    print('fabric forwarding anycast-gateway-mac ' + any_gw_mac)
+    for idx in range(pocet_vlan_vni_map):
+        customer_ID = 'Customer-ID-' + str(vrf_l3_vlan)
+        print('!')
+        print('interface Vlan' + str(zoznam_vlan[idx]))
+        print('  description ' + customer_ID + '-seg' + str(zoznam_vlan[idx]))
+        print('  no shutdown')
+        print('  vrf member ' + vrf_nazov)
+        print('  no ip redirects')
+        print('  ip address <VLOŽ-IP-ANYCAST-GW-VLAN' + str(zoznam_vlan[idx]))
+        print('  fabric forwarding mode anycast-gateway')
 
 print('!')
 print('! VXLAN-EVPN konf. bola vygenerovaná v čase: ' + t_teraz)
