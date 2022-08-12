@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 '''
-Jednoduchy Py3 skript generuje VXLAN-EVPN kofiguraciu pre Cis. Nexus 9K Switch.
-Treba intalovat python modul s: '$ pip3 install colorama'
+Jednoduchý Py3 skript generuje VXLAN-EVPN kofiguráciu pre Cis. Nexus 9K Switch.
+Treba inštalovať python modul s: '$ pip3 install colorama'
 Kontrola s: '$ pip3 list'
+
+Skript slúži ako testovací protoptyp a je na ňom čo zlepšovať. Dá sa použiť
+aj ako inšpirácia pre iné scenáre.
 
 by vlkv@Aug2022
 
-DOROBIT: - Dorobit generator pre "EVPN" sekciu
-         - Popisat kod tak, aby sa dal po roku pochopit
+DOROBIT: - Popisat kod tak, aby sa dal po roku pochopit
          - spravit funkciu na zadavanie VLAN, uz sa opakuje
          - osetrit zadavanie prefixu, aby to bolo cislo
 '''
