@@ -32,6 +32,9 @@ vni_max = ''
 #
 err_vlan_mimo = '\n-> CHYBA vstupu: Číslo VLANy mimo rozsah! (2-3967)\n'
 err_zoznam_dupl = '\n-> CHYBA vstupu: Duplicita v zozname L2 VLAN!\n'
+err_vni_mimo = '\n-> CHYBA vstupu: "Prefix+VLAN" mimo rozsah VNI! (16777216)\n'
+err_pfx_mimo = '\n-> CHYBA vstupu: Prefix mimo rozsah! (1-9999)\n'
+#
 s_uvod = 'Jednoduchý Py3 skript generuje VXLAN-EVPN konf. pre Cisco Nexus Sw.'
 s_treba = 'Treba zadať hodnoty VLAN a VNI prefixu tak, aby vzniklo platné VNI.'
 s_limit = 'Skript generuje VNI tak, aby boli menšie ako 16777216 (24-bit VNI).'
@@ -70,39 +73,23 @@ print()
 for idx in range(pocet_vlan_vni_map):
     zoznam_vlan.append(idx)
 
-    dupl = [number for number in zoznam_vlan if zoznam_vlan.count(number) > 1]
-
     while True:
         try:
-            vstup = input('Zadajte číslo ' + str(idx + 1) + '. L2-VLANy: ')
+            vstup = input('Zadajte číslo ' + str(idx + 1) + '. L2-VLAN: ')
             vstup = int(vstup)
             zoznam_vlan[idx] = vstup
+            vni_max = (str(vrf_l3_vlan) + str(max(zoznam_vlan)))
+            dupl = [num for num in zoznam_vlan if zoznam_vlan.count(num) > 1]
             if (vstup < 2 or vstup > 3967):
                 print(Fore.RED + err_vlan_mimo)
+            elif int(vni_max) > 16777216:
+                print(Fore.RED + err_vni_mimo)
+            elif len(dupl) > 0:
+                print(Fore.RED + err_zoznam_dupl)
             else:
                 break
         except Exception as err:
             print(Fore.RED + '\n-> CHYBA vstupu: ' + str(err) + '\n')
-
-    dupl = [number for number in zoznam_vlan if zoznam_vlan.count(number) > 1]
-
-    if len(dupl) > 0:
-        print(Fore.RED + err_zoznam_dupl)
-        stara_hodnota = zoznam_vlan[idx]
-        while zoznam_vlan[idx] == stara_hodnota:
-            vstup = input('Zadajte NOVÉ číslo ' + str(idx + 1) + '. VLANy: ')
-            vstup = int(vstup)
-            zoznam_vlan[idx] = vstup
-
-dupl = [number for number in zoznam_vlan if zoznam_vlan.count(number) > 1]
-
-if len(dupl) > 0:
-    print(Fore.RED + err_zoznam_dupl)
-    stara_hodnota = zoznam_vlan[idx]
-    while zoznam_vlan[idx] == stara_hodnota:
-        vstup = input('Zadajte NOVÉ číslo ' + str(idx + 1) + '. VLANy: ')
-        vstup = int(vstup)
-        zoznam_vlan[idx] = vstup
 
 print()
 
@@ -116,10 +103,10 @@ while vrf_l3_vlan == '':
         print(Fore.RED + '\n-> CHYBA vstupu: ' + str(err) + '\n')
         pfx_vni = 0
     if (pfx_vni < 1 or pfx_vni > 9999):
-        print(Fore.RED + '\n-> CHYBA vstupu: Prefix mimo rozsah! (1-1677)\n')
+        print(Fore.RED + '\n-> CHYBA vstupu: Prefix mimo rozsah! (1-9999)\n')
         vrf_l3_vlan = ''
     elif int(vni_max) > 16777216:
-        print(Fore.RED + '\n-> CHYBA vstupu: "Prefix+VLAN" mimo rozsah VNI!\n')
+        print(Fore.RED + err_vni_mimo)
         vrf_l3_vlan = ''
     else:
         vrf_l3_vlan = pfx_vni
