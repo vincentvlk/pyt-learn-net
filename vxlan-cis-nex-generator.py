@@ -121,9 +121,6 @@ while pfx_vni == 0:
     else:
         pfx_vni = int(pfx_vni)
 
-if vrf_l3_vlan != '':
-    pfx_vni = vrf_l3_vlan
-
 print('=' * 80)
 print('Boli zadané tieto hodnoty:\n')
 
@@ -188,6 +185,14 @@ if vrf_volba == 'a':
         print('  no ip redirects')
         print('  ip address <VLOŽ-IP-ANYCAST-GW-VLAN' + str(zoznam_vlan[idx]))
         print('  fabric forwarding mode anycast-gateway')
+
+print('!')
+print('interface nve1')
+if vrf_volba == 'a':
+    print('  member vni ' + str(vrf_l3_vlan) + ' associate-vrf')
+for idx in range(pocet_vlan_vni_map):
+    print('  member vni ' + str(pfx_vni) + str(zoznam_vlan[idx]))
+    print('    ingress-replication protocol bgp')
 
 print('!')
 print('! VXLAN-EVPN konf. bola vygenerovaná v čase: ' + t_teraz)
