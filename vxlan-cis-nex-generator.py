@@ -66,7 +66,7 @@ while True:
         pocet_vlan_vni_map = int(pocet_vlan_vni_map)
         break
     except Exception as err:
-        print(Fore.RED + '\n--> CHYBA vstupu: ' + str(err) + '\n')
+        print(Fore.RED + '\n-> CHYBA vstupu: ' + str(err) + '\n')
 
 print()
 
@@ -103,7 +103,7 @@ while vrf_l3_vlan == '':
         print(Fore.RED + '\n-> CHYBA vstupu: ' + str(err) + '\n')
         pfx_vni = 0
     if (pfx_vni < 1 or pfx_vni > 9999):
-        print(Fore.RED + '\n-> CHYBA vstupu: Prefix mimo rozsah! (1-9999)\n')
+        print(Fore.RED + err_pfx_mimo)
         vrf_l3_vlan = ''
     elif int(vni_max) > 16777216:
         print(Fore.RED + err_vni_mimo)
