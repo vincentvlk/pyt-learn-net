@@ -25,6 +25,7 @@ bgp_as_num = '64512'
 vrf_volba = ''
 vrf_nazov = ''
 vrf_l3_vlan = ''
+pfx_volba = ''
 pfx_vni = ''
 pocet_vlan_vni_map = ''
 zoznam_vlan = []
@@ -39,12 +40,14 @@ s_uvod = 'Jednoduchý Py3 skript generuje VXLAN-EVPN konf. pre Cisco Nexus Sw.'
 s_treba = 'Treba zadať hodnoty VLAN a VNI prefixu tak, aby vzniklo platné VNI.'
 s_limit = 'Skript generuje VNI tak, aby boli menšie ako 16777216 (24-bit VNI).'
 s_vlan_summary = 'Zoznam VLAN na L2-VNI mapovanie: '
+s_vrf_volba = '\nGenerovať konfiguráciu do Tenant VRF? (a:Áno / n:Nie): '
+s_pfx_volba = '\nChcete L3-VNI využiť ako prefix pre L2-VNI (a:Áno / n:Nie): '
 #
 print(Fore.YELLOW + '\n' + s_uvod)
 print(Fore.YELLOW + s_treba)
 print(Fore.YELLOW + s_limit)
 
-vrf_volba = input('\nGenerovať konfiguráciu do Tenant VRF? (a:Áno / n:Nie): ')
+vrf_volba = input(s_vrf_volba)
 
 if vrf_volba == 'a':
     vrf_nazov = input('\nZadajte názov VRF pre VXLAN: ')
@@ -59,6 +62,11 @@ while vrf_volba == 'a':
             break
     except Exception as err:
         print(Fore.RED + '\n-> CHYBA vstupu: ' + str(err) + '\n')
+
+pfx_volba = input(s_pfx_volba)
+
+if pfx_volba != 'a':
+    vrf_l3_vlan = ''
 
 while True:
     try:
@@ -128,7 +136,7 @@ print('Názov VRF pre Tenant VXLAN-EVPN: \t' + vrf_nazov)
 print('Číslo VLAN na L3-VNI mapovanie: \t' + str(vrf_l3_vlan))
 print(s_vlan_summary + '\t' + str(zoznam_vlan))
 print('Prefix na generovanie L2-VNI: \t\t' + str(pfx_vni))
-print('VNI prefix + VLAN maximum: \t\t' + vni_max)
+print('String VNI prefix + VLAN maximum: \t' + vni_max)
 print('=' * 80)
 
 # EOF
