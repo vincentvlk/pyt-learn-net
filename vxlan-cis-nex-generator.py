@@ -6,15 +6,12 @@ Kontrola s: '$ pip3 list'
 
 Skript slúži ako testovací protoptyp a je na ňom čo zlepšovať / meniť. Základná
 myšlienka je urýchlenie tvorby konf. syntaxe pre opakujúcu sa VXLAN-EVPN konf.
-Ďalším cieľom je generovať konf. bez zásadných chýb, ktoré spomaľujú nasadenie.  
-Skript sa dá samozrejme použiť aj ako inšpirácia pre iné scenáre.
+Ďalším cieľom je generovať konf. bez zásadných chýb, ktoré spomaľujú nasadenie.
+Skript sa dá samozrejme použiť ako inšpirácia pre iné scenáre.
 
 by vlkv@Aug2022
 
-DOROBIT: - Popisat kod tak, aby sa dal po roku pochopit
-         - spravit funkciu na zadavanie VLAN, uz sa opakuje
-         - pozriet "staru hodnotu"
-         - chyba vo VXLAN projekte s anycast-gw popisom
+TODO:
 '''
 # Importujeme potrebné moduly / knižnice:
 #
@@ -44,15 +41,18 @@ err_vlan_mimo = '\n-> CHYBA vstupu: Číslo VLANy mimo rozsah! (2-3967)\n'
 err_zoznam_dupl = '\n-> CHYBA vstupu: Duplicita v zozname L2 VLAN!\n'
 err_vni_mimo = '\n-> CHYBA vstupu: "Prefix+VLAN" mimo rozsah VNI! (16777216)\n'
 err_pfx_mimo = '\n-> CHYBA vstupu: Prefix mimo rozsah! (1-9999)\n'
+err_dup_l3vlan = '\n-> CHYBA vstupu: Toto číslo VLAN je duplicita s L3-VNI!\n'
 #
 s_uvod = 'Jednoduchý Py3 skript generuje VXLAN-EVPN konf. pre Cisco Nexus Sw.'
 s_treba = 'Treba zadať hodnoty VLAN a VNI prefixu tak, aby vzniklo platné VNI.'
-s_limit = 'Skript vkladá VNI tak, aby boli menšie ako 16777216 (24-bit VNI).'
+s_limit = 'Skript vkladá VNIs tak, aby boli menšie ako 16777216 (24-bit VNI).'
 s_vlan_summary = 'Zoznam VLAN na L2-VNI mapovanie: '
 s_vrf_volba = '\nGenerovať konfiguráciu do Tenant VRF? (a:Áno / n:Nie): '
 s_pfx_volba = '\nChcete L3-VNI využiť ako prefix pre L2-VNI (a:Áno / n:Nie): '
-s_vrf_ano = '\nBola zvolená konfigurácia s nasadením Tenant VRF.\n'
-s_vrf_nie = '\nBola zvolená konfigurácia bez nasadenia Tenant VRF.\n'
+s_vrf_ano = '\nBola zvolená konfigurácia s nasadením Tenant VRF.'
+s_vrf_nie = '\nBola zvolená konfigurácia bez nasadenia Tenant VRF.'
+s_pfx_ano = '\nPrefix pre L2-VNI sa bude generovať z hodnoty L3-VNI.'
+s_pfx_nie = '\nPrefix pre L2-VNI sa nebude generovať z hodnoty L3-VNI.'
 ###############################################################################
 # Sekcia, kde sa interaktívne zbierajú údaje od užívateľa.
 # Je nasadená základá kontrolu vstupu, aby skript nepadal pri chybe a umožnil
@@ -86,7 +86,10 @@ if vrf_volba == 'a':
     pfx_volba = input(s_pfx_volba)
 
 if pfx_volba == 'a':
+    print(Fore.YELLOW + s_pfx_ano)
     pfx_vni = vrf_l3_vlan
+else:
+    print(Fore.YELLOW + s_pfx_nie)
 
 while True:
     try:
@@ -114,6 +117,8 @@ for idx in range(pocet_vlan_vni_map):
                 print(Fore.RED + err_vni_mimo)
             elif len(dupl) > 0:
                 print(Fore.RED + err_zoznam_dupl)
+            elif vstup == vrf_l3_vlan:
+                print(Fore.RED + err_dup_l3vlan)
             else:
                 break
         except Exception as err:
@@ -130,6 +135,8 @@ while pfx_vni == 0:
     except Exception as err:
         print(Fore.RED + '\n-> CHYBA vstupu: ' + str(err) + '\n')
         pfx_vni = 0
+    # Táto podmienka sa dá v podstate odstrániť, ak používame nízke čísla VLAN:
+    #
     if (pfx_vni < 1 or pfx_vni > 9999):
         print(Fore.RED + err_pfx_mimo)
         pfx_vni = 0
@@ -139,28 +146,30 @@ while pfx_vni == 0:
     else:
         pfx_vni = int(pfx_vni)
 
-print('=' * 80)
-print('Boli zadané tieto hodnoty:\n')
+print(Fore.YELLOW + '=' * 80)
+print(Fore.YELLOW + 'Boli zadané tieto hodnoty:\n')
 
 if vrf_volba == 'a':
-    print('Generovať konfiguráciu do Tenant VRF: \tÁno')
+    print(Fore.YELLOW + 'Generovať konfiguráciu do Tenant VRF: \tÁno')
     vni_max = (str(pfx_vni) + str(max(zoznam_vlan)))
 else:
-    print('Generovať konfiguráciu do Tenant VRF: \tNie')
+    print(Fore.YELLOW + 'Generovať konfiguráciu do Tenant VRF: \tNie')
     vrf_l3_vlan = ''
 
-print('Názov VRF pre Tenant VXLAN-EVPN: \t' + vrf_nazov)
-print('Číslo VLAN na L3-VNI mapovanie: \t' + str(vrf_l3_vlan))
-print(s_vlan_summary + '\t' + str(zoznam_vlan))
-print('Prefix na generovanie L2-VNI: \t\t' + str(pfx_vni))
-print('String "VNI prefix + VLAN maximum": \t' + vni_max)
-print('=' * 80)
+print(Fore.YELLOW + 'Názov VRF pre Tenant VXLAN-EVPN: \t' + vrf_nazov)
+print(Fore.YELLOW + 'Číslo VLAN na L3-VNI mapovanie: \t' + str(vrf_l3_vlan))
+print(Fore.YELLOW + s_vlan_summary + '\t' + str(zoznam_vlan))
+print(Fore.YELLOW + 'Prefix na generovanie L2-VNI: \t\t' + str(pfx_vni))
+# Zakomentovaný riadok používam na ladenie generátora:
+#
+# print(Fore.YELLOW + 'String "VNI prefix + VLAN maximum": \t' + vni_max)
+print(Fore.YELLOW + '=' * 80)
 
 ###############################################################################
 # Sekcia na základe vložených údajov generuje základ VXLAN-EVPN služby.
 #
-print('\n-> Generujem VXLAN-EVPN konfiguráciu:\n')
-print('=' * 80)
+print(Fore.YELLOW + '-> Generujem VXLAN-EVPN konfiguráciu:')
+print(Fore.YELLOW + '=' * 80)
 print('!')
 print('! Nová VXLAN-EVPN konfigurácia vygenerovaná v čase: ' + t_teraz)
 print('! Dôkladne SKONTROLUJTE vygenerovanú konfiguráciu!')
@@ -225,6 +234,5 @@ for idx in range(pocet_vlan_vni_map):
 print('!')
 print('end')
 print('!')
-print('! Koniec VXLAN-EVPN konfigurácie.')
+print('! Koniec vygenerovanej VXLAN-EVPN konfigurácie.')
 print('!')
-# EOF
