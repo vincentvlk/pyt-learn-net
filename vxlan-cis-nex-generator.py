@@ -4,25 +4,31 @@ Jednoduchý Py3 skript generuje VXLAN-EVPN kofiguráciu pre Cis. Nexus 9K Switch
 Treba inštalovať python modul s: '$ pip3 install colorama'
 Kontrola s: '$ pip3 list'
 
-Skript slúži ako testovací protoptyp a je na ňom čo zlepšovať. Dá sa použiť
-aj ako inšpirácia pre iné scenáre.
+Skript slúži ako testovací protoptyp a je na ňom čo zlepšovať / meniť. Základná
+myšlienka je urýchlenie tvorby konf. syntaxe pre opakujúcu sa VXLAN-EVPN konf.
+Ďalším cieľom je generovať konf. bez zásadných chýb, ktoré spomaľujú nasadenie.  
+Skript sa dá samozrejme použiť aj ako inšpirácia pre iné scenáre.
 
 by vlkv@Aug2022
 
 DOROBIT: - Popisat kod tak, aby sa dal po roku pochopit
          - spravit funkciu na zadavanie VLAN, uz sa opakuje
-         - osetrit zadavanie prefixu, aby to bolo cislo
+         - pozriet "staru hodnotu"
+         - chyba vo VXLAN projekte s anycast-gw popisom
 '''
-
-# importujeme potrebne moduly/kniznice:
+# Importujeme potrebné moduly / knižnice:
+#
 import colorama
 from colorama import Fore
 import datetime
+
+###############################################################################
+# Sekcia s nastavením premenných.
 #
 colorama.init(autoreset=True)
 t_teraz = str(datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S'))
+# Podľa prostredia nastavíme MAC adresu pre Anycast GW, musí byť typu *Unicast*
 #
-bgp_as_num = '64512'
 any_gw_mac = '2022.2022.2022'
 #
 vrf_volba = ''
@@ -45,9 +51,14 @@ s_limit = 'Skript vkladá VNI tak, aby boli menšie ako 16777216 (24-bit VNI).'
 s_vlan_summary = 'Zoznam VLAN na L2-VNI mapovanie: '
 s_vrf_volba = '\nGenerovať konfiguráciu do Tenant VRF? (a:Áno / n:Nie): '
 s_pfx_volba = '\nChcete L3-VNI využiť ako prefix pre L2-VNI (a:Áno / n:Nie): '
-
+s_vrf_ano = '\nBola zvolená konfigurácia s nasadením Tenant VRF.\n'
+s_vrf_nie = '\nBola zvolená konfigurácia bez nasadenia Tenant VRF.\n'
 ###############################################################################
-
+# Sekcia, kde sa interaktívne zbierajú údaje od užívateľa.
+# Je nasadená základá kontrolu vstupu, aby skript nepadal pri chybe a umožnil
+# dodatočnú úpravu zadaných údajov. Na konci sekcie je výpis so sumárom
+# vložených údajov:
+#
 print(Fore.YELLOW + '\n' + s_uvod)
 print(Fore.YELLOW + s_treba)
 print(Fore.YELLOW + s_limit)
@@ -55,7 +66,10 @@ print(Fore.YELLOW + s_limit)
 vrf_volba = input(s_vrf_volba)
 
 if vrf_volba == 'a':
+    print(Fore.YELLOW + s_vrf_ano)
     vrf_nazov = input('\nZadajte názov VRF pre VXLAN: ')
+else:
+    print(Fore.YELLOW + s_vrf_nie)
 
 while vrf_volba == 'a':
     try:
@@ -143,7 +157,8 @@ print('String "VNI prefix + VLAN maximum": \t' + vni_max)
 print('=' * 80)
 
 ###############################################################################
-
+# Sekcia na základe vložených údajov generuje základ VXLAN-EVPN služby.
+#
 print('\n-> Generujem VXLAN-EVPN konfiguráciu:\n')
 print('=' * 80)
 print('!')
