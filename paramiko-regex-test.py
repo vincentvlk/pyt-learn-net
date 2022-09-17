@@ -9,6 +9,7 @@ import time
 # import datetime
 import threading
 import re
+from pprint import pprint
 
 n91leaf1 = {'hostname': '192.168.5.201',
             'username': 'admin',
@@ -49,18 +50,33 @@ def cisco_int_parser(hostname, username, password):
 
     output = device_access.recv(65535).decode()
     print(output)
-    print('Parsujem vystup')
+
+#   Tato logika len vypisuje podla regEx matchu
+#
+#   print('Parsujem vystup')
+#   int_iter = int_pattern.finditer(output)
+#   for interface in int_iter:
+#        print(f"\n { '*' *30}")
+#        print(f"Nazov iface: {interface.group(1)}")
+#        print(f"IP adresa: {interface.group(2)}")
+#        print(f"Stav iface: {interface.group(4)}")
+
+#   Tato logika vytvara zoznam (List) slovnikov (Dicts) z CLI vypisu:
+    int_list = list()
     int_iter = int_pattern.finditer(output)
     for interface in int_iter:
-        print(f"\n { '*' *30}")
-        print(f"Nazov iface: {interface.group(1)}")
-        print(f"IP adresa: {interface.group(2)}")
-        print(f"Stav iface: {interface.group(4)}")
+        int_dict = dict()
+        int_dict['intf'] = interface.group(1)
+        int_dict['ip'] = interface.group(2)
+
+        int_list.append(int_dict)
+    print('-=' * 40)
+    pprint(int_list)
 
 
 bkp_threads_list = []
 
-for device in [cat1sw]:
+for device in [n91leaf1]:
     bkp_thread = threading.Thread(target=cisco_int_parser, kwargs=device)
     bkp_threads_list.append(bkp_thread)
     bkp_thread.start()
