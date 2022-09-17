@@ -52,7 +52,10 @@ def cisco_int_parser(hostname, username, password):
     print('Parsujem vystup')
     int_iter = int_pattern.finditer(output)
     for interface in int_iter:
-        print(interface)
+        print(f"\n { '*' *30}")
+        print(f"Nazov iface: {interface.group(1)}")
+        print(f"IP adresa: {interface.group(2)}")
+        print(f"Stav iface: {interface.group(4)}")
 
 
 bkp_threads_list = []

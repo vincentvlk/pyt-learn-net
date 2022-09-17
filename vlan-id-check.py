@@ -4,6 +4,9 @@ Jednoduchy Py3 skript hlada volne/obsadene VLANy na Cis. Catalyst/Nexus Sw.
 Treba intalovat python moduly s: $ pip3 install netmiko colorama
 Kontrola s: $ pip3 list
 
+pouzit pattern: "(\d+\s+\S+\s+active|not found in current VLAN database)"
+kniznica "import re"
+
 by vlkv@jul2022
 '''
 
