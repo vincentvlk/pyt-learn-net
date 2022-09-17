@@ -6,12 +6,9 @@ Jednoduchy Py3 skript "netmiko-test.py" na ucenie kniznice Paramiko.
 
 import paramiko
 import time
-import datetime
+# import datetime
 import threading
-
-# hostname = '192.168.5.201'
-# username = 'admin'
-# password = 'Cisco.123'
+import re
 
 n91leaf1 = {'hostname': '192.168.5.201',
             'username': 'admin',
@@ -27,6 +24,10 @@ cat1sw = {'hostname': '192.168.5.211',
 
 flotila_list = [n91leaf1, n92leaf2, cat1sw]
 
+# regx = '(\S+)\s+(([\d\.]+)|unassigned)\s+\S+\s+\S+\s+(up|administratively down)\s+(\S+)'
+
+int_pattern = re.compile(r"(\S+)\s+(([\d\.]+)|unassigned)\s+\S+\s+\S+\s+(up|administratively down)\s+(\S+)")
+
 
 def cisco_int_parser(hostname, username, password):
     ssh_client = paramiko.client.SSHClient()
@@ -40,7 +41,7 @@ def cisco_int_parser(hostname, username, password):
                        allow_agent=False)
 
     device_access = ssh_client.invoke_shell()
-    print(f'Connected to \"{hostname}\"')
+    print(f'\nPripojeny na SSHv2 zariadenie \"{hostname}\"')
 
     device_access.send(b'terminal length 0\n')
     device_access.send(b'show ip interface brief\n')
@@ -48,17 +49,11 @@ def cisco_int_parser(hostname, username, password):
 
     output = device_access.recv(65535).decode()
     print(output)
+    print('Parsujem vystup')
+    int_iter = int_pattern.finditer(output)
+    for interface in int_iter:
+        print(interface)
 
-    teraz = str(datetime.datetime.now().strftime('%d.%m.%Y-%H:%M:%S'))
-
-    print(f'Config zariadenia \"{hostname}\" ukladam do suboru.')
-    with open('ip_int-' + hostname + '-' + teraz + '.txt', 'w') as p_data:
-        p_data.write(output)
-
-    ssh_client.close()
-
-
-# config_backup(**n91leaf1)
 
 bkp_threads_list = []
 
