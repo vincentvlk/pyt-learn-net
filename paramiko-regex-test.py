@@ -28,7 +28,7 @@ cat1sw = {'hostname': '192.168.5.211',
 flotila_list = [n91leaf1, n92leaf2, cat1sw]
 
 
-def config_backup(hostname, username, password):
+def cisco_int_parser(hostname, username, password):
     ssh_client = paramiko.client.SSHClient()
     ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
@@ -43,7 +43,7 @@ def config_backup(hostname, username, password):
     print(f'Connected to \"{hostname}\"')
 
     device_access.send(b'terminal length 0\n')
-    device_access.send(b'show running-config\n')
+    device_access.send(b'show ip interface brief\n')
     time.sleep(5)
 
     output = device_access.recv(65535).decode()
@@ -52,7 +52,7 @@ def config_backup(hostname, username, password):
     teraz = str(datetime.datetime.now().strftime('%d.%m.%Y-%H:%M:%S'))
 
     print(f'Config zariadenia \"{hostname}\" ukladam do suboru.')
-    with open('backup-' + hostname + '-' + teraz + '.txt', 'w') as p_data:
+    with open('ip_int-' + hostname + '-' + teraz + '.txt', 'w') as p_data:
         p_data.write(output)
 
     ssh_client.close()
@@ -62,8 +62,8 @@ def config_backup(hostname, username, password):
 
 bkp_threads_list = []
 
-for device in flotila_list:
-    bkp_thread = threading.Thread(target=config_backup, kwargs=device)
+for device in [cat1sw]:
+    bkp_thread = threading.Thread(target=cisco_int_parser, kwargs=device)
     bkp_threads_list.append(bkp_thread)
     bkp_thread.start()
 
