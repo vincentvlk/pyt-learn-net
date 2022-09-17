@@ -7,6 +7,7 @@ Jednoduchy Py3 skript "netmiko-test.py" na ucenie kniznice Paramiko.
 import paramiko
 import time
 import datetime
+import threading
 
 # hostname = '192.168.5.201'
 # username = 'admin'
@@ -23,6 +24,8 @@ n92leaf2 = {'hostname': '192.168.5.202',
 cat1sw = {'hostname': '192.168.5.211',
           'username': 'admin',
           'password': 'Cisco.123'}
+
+flotila_list = [n91leaf1, n92leaf2, cat1sw]
 
 
 def config_backup(hostname, username, password):
@@ -55,4 +58,14 @@ def config_backup(hostname, username, password):
     ssh_client.close()
 
 
-config_backup(**n91leaf1)
+# config_backup(**n91leaf1)
+
+bkp_threads_list = []
+
+for device in flotila_list:
+    bkp_thread = threading.Thread(target=config_backup, kwargs=device)
+    bkp_threads_list.append(bkp_thread)
+    bkp_thread.start()
+
+for thread in bkp_threads_list:
+    thread.join()
