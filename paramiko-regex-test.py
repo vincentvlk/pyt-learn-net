@@ -65,6 +65,8 @@ def cisco_int_parser(hostname, username, password):
     int_list = list()
     int_iter = int_pattern.finditer(output)
     for interface in int_iter:
+        if interface.group(2) == 'unassigned':
+            continue
         int_dict = dict()
         int_dict['intf'] = interface.group(1)
         int_dict['ip'] = interface.group(2)
@@ -76,7 +78,7 @@ def cisco_int_parser(hostname, username, password):
 
 bkp_threads_list = []
 
-for device in [n91leaf1]:
+for device in [cat1sw]:
     bkp_thread = threading.Thread(target=cisco_int_parser, kwargs=device)
     bkp_threads_list.append(bkp_thread)
     bkp_thread.start()
